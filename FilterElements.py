@@ -4,7 +4,23 @@ import Autodesk.Revit.DB as DB
 doc = __revit__.ActiveUIDocument.Document
 uidoc = __revit__.ActiveUIDocument
 
-# Accesses the ID# associated with the built-in paramater "System Classification" 
+def get_selected_elements():
+    """
+    Return Selected Elements as a list[]. Returns empty list if no elements are selected.
+    Usage:
+    - Select 1 or more elements
+    > selected_elements = get_selected_elements()
+    > []
+    """
+    selection = uidoc.Selection
+    selection_ids = selection.GetElementIds()
+    elements = []
+    for element_id in selection_ids:
+        elements.append(element_id)
+
+    return elements
+
+# Accesses the ID associated with the built-in paramater "System Classification" 
 # See RevitApiDocs: BuiltInParameter Enumeration
 sysClass_id = DB.ElementId(DB.BuiltInParameter.RBS_SYSTEM_CLASSIFICATION_PARAM)
 # The filter needs the ID of the parameter we are searching for:
@@ -30,7 +46,19 @@ col_items = DB.FilteredElementCollector(doc) \
         .WherePasses(sysClass_param_filter) \
         .ToElementIds()
 
+selected_elements = get_selected_elements()
 
+cross = set(selected_elements).intersection(col_items)
+
+print("\n" * 2 + "~~ Selected Elements ~~" + "\n" * 2)
+for element in selected_elements:
+    print(element)
+
+print("\n" * 2 + "~~ Collected Elements ~~" + "\n" * 2)
 for item in col_items:
+    print(item)
+
+print("\n" * 2 + "~~ Filtered Elements ~~" + "\n" * 2)
+for item in cross:
     print(item)
 
